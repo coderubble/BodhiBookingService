@@ -1,0 +1,210 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "BODHI BOOKING SERVICE",
+    "description": "This service is used to manage users of BODHI Application ",
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "securityDefinitions": {
+    "JWT": {
+      "type": "apiKey",
+      "name": "x-access-token",
+      "in": "header"
+    }
+  },
+  "security": [
+    {
+      "JWT": []
+    }
+  ],
+  "responses": {
+    "UnauthorizedError": {
+      "description": "Access token is missing or invalid"
+    }
+  },
+  "host": "localhost:3000",
+  "basePath": "/api/v1",
+  "tags": [
+    {
+      "name": "Booking",
+      "description": "API for booking in the system"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/booking": {
+      "get": {
+        "tags": [
+          "Booking"
+        ],
+        "summary": "Get all Booking details in system",
+        "description": "This can only be done by the logged in user.",
+        "operationId": "viewBooking",
+        "produces": "application/xml,application/json",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": "true",
+            "description": "From Record",
+            "default": "0"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": "true",
+            "description": "To Record",
+            "default": "10"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Booking"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Booking"
+        ],
+        "summary": "Create booking details into system",
+        "description": "This can only be done by the logged in user.",
+        "operationId": "createBooking",
+        "produces": "application/xml,application/json",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": "true",
+            "description": "Enter booking details"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Booking"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Booking"
+        ],
+        "summary": "Cancel Booking",
+        "description": "This can only be done by the logged in user.",
+        "operationId": "cancelBooking",
+        "produces": "application/xml,application/json",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": "true",
+            "description": "Cancel Booking"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Booking"
+            }
+          }
+        }
+      }
+    },
+    "/user/{email_id}": {
+      "delete": {
+        "tags": [
+          "Booking"
+        ],
+        "summary": "Delete Booking in system",
+        "description": "This can only be done by the logged in user.",
+        "operationId": "deleteUser",
+        "produces": "application/xml,application/json",
+        "parameters": [
+          {
+            "name": "email_id",
+            "in": "path",
+            "required": "true",
+            "description": "Delete user"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Booking"
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Booking"
+        ],
+        "summary": "View my details",
+        "description": "This can only be done by the logged in user.",
+        "operationId": "viewUser",
+        "produces": "application/xml,application/json",
+        "parameters": [
+          {
+            "name": "email_id",
+            "in": "path",
+            "required": "true",
+            "description": "View my Details"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Booking"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Booking": {
+      "required": [
+        "booking_id"
+      ],
+      "properties": {
+        "patient_email_id": {
+          "type": "string",
+          "uniqueItems": true
+        },
+        "clinic_id": {
+          "type": "string"
+        },
+        "doctor_id": {
+          "type": "string"
+        },
+        "date": {
+          "type": "date"
+        },
+        "time": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
