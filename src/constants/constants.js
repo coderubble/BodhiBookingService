@@ -1,8 +1,14 @@
-const roles = {
-  BOOKED: 'B',
-  PENDING: 'P',
-  BLOCKED: 'BL',
-  OPEN: 'O',
-  CANCEL:'C'
+const status = {
+  BOOKED: 'BOOKED',
+  PENDING: 'PENDING',
+  BLOCKED: 'BLOCKED',
+  OPEN: 'OPEN',
+  CANCELLED: 'CANCELLED'
 }
-module.exports = roles;
+const roles = {
+  CLINIC_ADMIN: 'A',
+  CLINIC_USER: 'U',
+  SYSTEM_ADMIN: 'S',
+  PATIENT: 'P'
+}
+module.exports = { status, roles };

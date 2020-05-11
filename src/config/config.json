@@ -1,0 +1,17 @@
+{
+  "dev": {
+    "username": "postgres",
+    "password": "mysecretpassword",
+    "database": "bodhi",
+    "host": "192.168.99.100",
+    "dialect": "postgres",
+    "operatorsAliases": false
+  },
+  "test": {
+    "username": null,
+    "password": null,
+    "database": "main",
+    "host": "localhost",
+    "dialect": "sqlite"
+  }
+}

@@ -1,4 +1,5 @@
 const routes = require("./controller/routes.js");
+const models = require("./models");
 const express = require("express");
 const app = express();
 require("dotenv").config();
@@ -8,8 +9,12 @@ const swaggerDocument = require("./swagger.json");
 app.use(express.json());
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument, { explorer: true }));
 app.use(process.env.API_PREFIX, routes);
-const server = app.listen(PORT, function () {
-  console.log("Server is running at Port " + PORT);
+models.sequelize.sync().then(() => {
+  if (process.env.NODE_ENV !== 'test') {
+    const server = app.listen(PORT, function () {
+      console.log("Server is running at Port " + PORT);
+    });
+  }
 });
 
-module.exports = server;
+module.exports = app;

@@ -129,7 +129,7 @@
         }
       }
     },
-    "/user/{email_id}": {
+    "/booking/{date}": {
       "delete": {
         "tags": [
           "Booking"
@@ -159,13 +159,13 @@
         "tags": [
           "Booking"
         ],
-        "summary": "View my details",
+        "summary": "View Booking details by Date",
         "description": "This can only be done by the logged in user.",
         "operationId": "viewUser",
         "produces": "application/xml,application/json",
         "parameters": [
           {
-            "name": "email_id",
+            "name": "date",
             "in": "path",
             "required": "true",
             "description": "View my Details"
