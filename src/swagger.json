@@ -129,7 +129,7 @@
         }
       }
     },
-    "/user/{email_id}": {
+    "/booking/{date}": {
       "delete": {
         "tags": [
           "Booking"
@@ -159,13 +159,52 @@
         "tags": [
           "Booking"
         ],
-        "summary": "View my details",
+        "summary": "View Booking details by Date",
         "description": "This can only be done by the logged in user.",
         "operationId": "viewUser",
         "produces": "application/xml,application/json",
         "parameters": [
           {
-            "name": "email_id",
+            "name": "date",
+            "in": "path",
+            "required": "true",
+            "description": "View my Details"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Booking"
+            }
+          }
+        }
+      }
+    },
+    "/booking/createSchedule/{clinic_id}/{doctor_id}/{load_date}": {
+      "post": {
+        "tags": [
+          "Booking"
+        ],
+        "summary": "Load Doctor Schedule details by Clinic ID & Doctor ID",
+        "description": "This can only be done by the logged in user.",
+        "operationId": "createSchedule",
+        "produces": "application/xml,application/json",
+        "parameters": [
+          {
+            "name": "clinic_id",
+            "in": "path",
+            "required": "true",
+            "description": "View my Details"
+          },
+          {
+            "name": "doctor_id",
+            "in": "path",
+            "required": "true",
+            "description": "View my Details"
+          },
+          {
+            "name": "load_date",
             "in": "path",
             "required": "true",
             "description": "View my Details"

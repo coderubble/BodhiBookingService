@@ -4,9 +4,9 @@
   "description": "Manage Booking details",
   "main": "index.js",
   "scripts": {
-    "test": "env-cmd -f config/test.env jest --config ./jest.config.json --coverage --detectOpenHandles",
+    "test": "env-cmd -f src/config/test.env jest --config ./jest.config.json --coverage --detectOpenHandles --maxWorkers=2",
     "test:debug": "env-cmd -f config/test.env node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand test/booking.spec.js",
-    "dev": "env-cmd -f config/dev.env nodemon src/app.js"
+    "dev": "env-cmd -f src/config/dev.env nodemon src/app.js"
   },
   "repository": {
     "type": "git",
@@ -19,7 +19,9 @@
   },
   "homepage": "https://github.com/coderubble/BodhiBookingService#readme",
   "dependencies": {
+    "axios": "^0.19.2",
     "body-parser": "^1.19.0",
+    "cron-parser": "^2.13.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-validator": "^6.4.0",
@@ -31,6 +33,7 @@
     "swagger-ui-express": "^4.1.4"
   },
   "devDependencies": {
+    "axios-mock-adapter": "^1.18.1",
     "chai": "^4.2.0",
     "env-cmd": "^10.1.0",
     "eslint": "^6.8.0",
