@@ -1,22 +1,22 @@
 const models = require("../models");
+const sequelize = models.sequelize;
 const Booking = models.booking;
 const constants = require("../constants/constants");
+const { Op } = require("sequelize");
+const parser = require('cron-parser');
 const { BOOKED, PENDING, BLOCKED, OPEN, CANCELLED } = constants.status;
-const { CLINIC_ADMIN, CLINIC_USER, PATIENT } =constants.roles;
+const { CLINIC_ADMIN, CLINIC_USER, PATIENT } = constants.roles;
+const scheduleList = require("../utils/schedule.util");
 
 exports.createBooking = async function ({ patient_email_id, clinic_id, doctor_id, date, time, status }, userInfo, callback) {
   const bookingData = { patient_email_id, clinic_id, doctor_id, date, time, status };
-  console.log(`BOOKING DETAILS:${JSON.stringify(bookingData)}>>>>userInfo:${JSON.stringify(userInfo)}`);
   try {
     if (userInfo.email_id === patient_email_id) {
-      const existingDetails = await Booking.findOne({ where: { doctor_id, time } });
+      const existingDetails = await Booking.findOne({ where: { doctor_id, time, status: { [Op.or]: [BOOKED, PENDING, OPEN] } } });
       if (existingDetails !== null) {
-        if (existingDetails.status === BOOKED) {
-          throw ("Timeslot Already Booked");
-        }
+        throw ("Timeslot Already Booked");
       } else {
         await Booking.create(bookingData).then(result => {
-          console.log(`Result:${JSON.stringify(result)}`);
           callback(null, result);
         }).catch(error => {
           console.log(`Error:${JSON.stringify(error)}`);
@@ -31,6 +31,34 @@ exports.createBooking = async function ({ patient_email_id, clinic_id, doctor_id
     console.log(`Service catch:${JSON.stringify(error)}`);
     callback(error);
   };
+};
+
+exports.insertSchedule = async function ({ clinic_id, doctor_id, load_date }, { schedule }, callback) {
+  let transaction = null;
+  try {
+    let timeslots = [];
+    timeslots = scheduleList(schedule, load_date);
+    transaction = await sequelize.transaction();
+    if (Array.isArray(timeslots) && timeslots.length) {
+      let schedule;
+      for (let index = 0; index < timeslots.length; index++) {
+        schedule = await Booking.create({ patient_email_id: '', clinic_id, doctor_id, date: load_date, time: timeslots[index], status: OPEN }, { transaction });
+      }
+      await transaction.commit();
+      if (schedule) {
+        callback(null, 'success');
+      } else {
+        console.log("Error while inserting Schedule details");
+        throw "Error while inserting Schedule details";
+      }
+    } else {
+      throw "Empty Array of Timeslots"
+    }
+  } catch (error) {
+    await transaction.rollback();
+    console.log(`Catch error:${JSON.stringify(error)}`);
+    callback(error);
+  }
 };
 
 exports.cancelBooking = async function ({ patient_email_id, clinic_id, doctor_id, date, time, status }, userInfo, callback) {
@@ -62,18 +90,36 @@ exports.cancelBooking = async function ({ patient_email_id, clinic_id, doctor_id
   }
 };
 
-exports.viewBooking = async function ({ from, to }, { date },userInfo, callback) {
-  const to_record = to || 1;
+exports.viewBooking = async function ({ from, to }, { date }, userInfo, callback) {
+  const to_record = to || 50;
   const offset = from || 0;
   const limit = Math.min(25, to_record - offset);
-
-  await Booking.findAndCountAll({ limit, offset, where: { date,clinic_id:userInfo.clinic_id } })
-    .then((bookingDetails) => {
-      callback(null, bookingDetails)
-    }).catch(error => {
-      console.log(`View Booking catch: ${JSON.stringify(error)} `);
-      callback(error);
-    })
-
+  try {
+    if ([CLINIC_ADMIN, CLINIC_USER].includes(userInfo.user_type)) {
+      await Booking.findAndCountAll({ limit, offset, where: { date, clinic_id: userInfo.clinic_id } })
+        .then((bookingDetails) => {
+          callback(null, bookingDetails)
+        }).catch(error => {
+          console.log(`View Booking catch(Clinic): ${JSON.stringify(error)} `);
+          callback(error);
+        })
+    } else if (userInfo.user_type === PATIENT) {
+      await Booking.findAndCountAll({ limit, offset, where: { date, patient_email_id: userInfo.email_id } })
+        .then((bookingDetails) => {
+          callback(null, bookingDetails)
+        }).catch(error => {
+          console.log(`View Booking catch(Patient): ${JSON.stringify(error)} `);
+          callback(error);
+        })
+    }
+    else {
+      throw ('Unauthorised to View Bookings');
+    }
+  } catch (error) {
+    callback(error);
+  }
 }
 
+exports.loadSchedule = function (callback) {
+
+};

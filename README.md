@@ -25,6 +25,6 @@ seeders, contains all seed files
         "doctor_id":"5eab42762d4e1b4db8fd6a8d",
         "date": "2019-01-01",
         "time": "10:00",
-        "status":"B"
+        "status":"BOOKED"
     }
 ```

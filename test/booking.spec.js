@@ -5,7 +5,7 @@ const app = require("../src/app");
 const models = require("../src/models");
 const constants = require("../src/constants/constants");
 const { BOOKED, PENDING, BLOCKED, OPEN, CANCELLED } = constants.status
-
+const { CLINIC_ADMIN, CLINIC_USER, PATIENT } = constants.roles;
 
 const bookingData = {
   patient_email_id: "patient@bodhi.com",
@@ -32,6 +32,15 @@ const bookingData2 = {
   date: "2000-01-01",
   time: "14:00",
   status: BOOKED
+}
+
+const bookingData3 = {
+  patient_email_id: "",
+  clinic_id: "12345",
+  doctor_id: "d123",
+  date: "2000-01-01",
+  time: "14:00",
+  status: OPEN
 }
 
 var mock = new MockAdapter(axios);
@@ -134,18 +143,62 @@ describe("Booking Service", () => {
 
   it("View All Bookings", async (done) => {
     mock.onGet(`${process.env.USERSERVICE_URL}/user`).reply(200, {
-      "email_id": "patient@bodhi.com",
-      "user_type": "P",
+      "email_id": "clinic_admin@bodhi.com",
+      "user_type": CLINIC_USER,
       "clinic_id": "12345"
     });
     const res4 = await request(app)
       .get(`${process.env.API_PREFIX}/booking/2000-01-01?from=0&to=20`);
-    // console.log(`Result:${JSON.stringify(res4)}`);
-    console.log(`status:${res4.statusCode}`);
-    const result = JSON.parse(res4.text).rows;
-    console.log(`Result:${JSON.stringify(result)}`);
+    console.log(`View booking,clinic:${JSON.stringify(res4)}`);
     expect(res4.statusCode).toEqual(200);
+    // const result = JSON.parse(res4.text).rows;
+    //console.log(`Result:${JSON.stringify(result)}`);
     // expect(result).toEqual(bookingData1);
+
+    // mock.onGet(`${process.env.USERSERVICE_URL}/user`).reply(200, {
+    //   "email_id": "patient1@bodhi.com",
+    //   "user_type": PATIENT,
+    //   "clinic_id": "null"
+    // });
+    // const res5 = await request(app)
+    //   .get(`${process.env.API_PREFIX}/booking/2000-01-01?from=0&to=20`);
+    // console.log(`View Booking,Patient2:${JSON.stringify(res5)}`);
+    // expect(res5.statusCode).toEqual(200);
+    // const bookings = JSON.parse(res5.text).rows;
+    // if (bookings.length) {
+    //   console.log(`Result:${JSON.stringify(bookings)}`);
+    //   result = bookings.map(b => b);
+    //  // expect(result).toEqual(expect.array)
+    // }
+    // else {
+    //   console.log('No bookings to view');
+
+    // }
     done();
   });
+
+  // it("View All Bookings Failure", async (done) => {
+  //   mock.onGet(`${process.env.USERSERVICE_URL}/user`).reply(200, {
+  //     "email_id": "clinic_admin@bodhi.com",
+  //     "user_type": PATIENT,
+  //     "clinic_id": "12345"
+  //   });
+  //   const res4 = await request(app)
+  //     .get(`${process.env.API_PREFIX}/booking/2000-01-01?from=0&to=20`);
+  //   expect(res4.statusCode).toEqual(400);
+  //   done();
+  // });
+
+  it("Load Schedule", async (done) => {
+    mock.onGet(`${process.env.CLINICSERVICE_URL}/clinic/schedule/12345/d123`).reply(200, {
+      "_id": "12345",
+      "joining_date": "2020-05-12T00:00:00.000Z",
+      "schedule": "*/15 8-16 * * 1-5"
+    });
+    const res4 = await request(app)
+      .post(`${process.env.API_PREFIX}/booking/createSchedule/12345/d123/2020-05-14`)
+      .send(bookingData2)
+    expect(res4.statusCode).toEqual(200);
+    done();
+  })
 });

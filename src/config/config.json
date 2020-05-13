@@ -5,7 +5,10 @@
     "database": "bodhi",
     "host": "192.168.99.100",
     "dialect": "postgres",
-    "operatorsAliases": false
+    "dialectOptions": {
+      "useUTC": false
+    },
+    "timezone": "+10:00"
   },
   "test": {
     "username": null,
