@@ -2,8 +2,7 @@
 const constants = require("../constants/constants");
 const { BOOKED, PENDING, BLOCKED, OPEN, CANCELLED } = constants.status;
 module.exports = {
-  up: (migration, queryInterface, DataTypes) => {
-    migration.migrator.sequelize.query("SET TIME ZONE 'Australia/Sydney'");
+  up: (queryInterface, DataTypes) => {
     return queryInterface.createTable('bookings', {
       id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       patient_email_id: { type: DataTypes.STRING, allowNull: false },
