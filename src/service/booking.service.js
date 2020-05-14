@@ -42,7 +42,7 @@ exports.insertSchedule = async function ({ clinic_id, doctor_id, load_date }, { 
     if (Array.isArray(timeslots) && timeslots.length) {
       let schedule;
       for (let index = 0; index < timeslots.length; index++) {
-        schedule = await Booking.create({ patient_email_id: '', clinic_id, doctor_id, time: timeslots[index], status: OPEN }, { transaction });
+        schedule = await Booking.create({ patient_email_id: '', clinic_id, doctor_id, time_slot: timeslots[index], status: OPEN }, { transaction });
       }
       await transaction.commit();
       if (schedule) {
@@ -91,19 +91,25 @@ exports.cancelBooking = async function ({ patient_email_id, clinic_id, doctor_id
 };
 
 exports.viewBooking = async function ({ from, to }, { given_date }, userInfo, callback) {
+  console.log(`given date:${given_date}`);
+
   const to_record = to || 50;
   const offset = from || 0;
   const limit = Math.min(25, to_record - offset);
   try {
     if ([CLINIC_ADMIN, CLINIC_USER].includes(userInfo.user_type)) {
-      //await Booking.findAndCountAll({ limit, offset, where: { Date(time_slot): given_date, clinic_id: userInfo.clinic_id }, order: [['time', 'ASC']] })
-
-      await Booking.findAndCountAll({ limit, offset }).then((bookingDetails) => {
-        callback(null, bookingDetails)
-      }).catch(error => {
-        console.log(`View Booking catch(Clinic): ${JSON.stringify(error)} `);
-        callback(error);
+      await Booking.findAndCountAll({
+        limit, offset, where: {
+          clinic_id: userInfo.clinic_id,
+          andOp: sequelize.where(sequelize.fn('DATE', sequelize.col('time_slot')), given_date)
+        }, order: [['time_slot', 'ASC']]
       })
+        .then((bookingDetails) => {
+          callback(null, bookingDetails)
+        }).catch(error => {
+          console.log(`View Booking catch(Clinic): ${JSON.stringify(error)} `);
+          callback(error);
+        })
     } else if (userInfo.user_type === PATIENT) {
       await Booking.findAndCountAll({ limit, offset, where: { patient_email_id: userInfo.email_id } })
         .then((bookingDetails) => {

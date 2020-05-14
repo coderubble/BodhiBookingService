@@ -43,7 +43,7 @@ router.put("/", auth, (req, res) => {
   });
 })
 //View Bookings by Clinic Admin/Clinic User of their clinic on a particular date
-router.get("/:date", auth,(req, res) => {
+router.get("/:given_date", auth,(req, res) => {
   getUserInfo(res, (error, result) => {
     if (result) {
       const userInfo = result.data;
