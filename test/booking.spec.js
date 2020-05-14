@@ -11,8 +11,7 @@ const bookingData = {
   patient_email_id: "patient@bodhi.com",
   clinic_id: "12345",
   doctor_id: "d123",
-  date: "2000-01-01",
-  time: "11:30",
+  time_slot: "11:30",
   status: BOOKED
 }
 
@@ -20,8 +19,7 @@ const bookingData1 = {
   patient_email_id: "patient@bodhi.com",
   clinic_id: "12345",
   doctor_id: "d123",
-  date: "2000-01-01",
-  time: "10:00",
+  time_slot: "10:00",
   status: BOOKED
 }
 

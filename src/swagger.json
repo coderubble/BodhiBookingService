@@ -129,7 +129,7 @@
         }
       }
     },
-    "/booking/{date}": {
+    "/booking/{given_date}": {
       "delete": {
         "tags": [
           "Booking"
@@ -140,7 +140,7 @@
         "produces": "application/xml,application/json",
         "parameters": [
           {
-            "name": "email_id",
+            "name": "given_date",
             "in": "path",
             "required": "true",
             "description": "Delete user"
@@ -165,7 +165,7 @@
         "produces": "application/xml,application/json",
         "parameters": [
           {
-            "name": "date",
+            "name": "given_date",
             "in": "path",
             "required": "true",
             "description": "View my Details"
@@ -237,10 +237,7 @@
         "doctor_id": {
           "type": "string"
         },
-        "date": {
-          "type": "date"
-        },
-        "time": {
+        "time_slot": {
           "type": "string"
         }
       }

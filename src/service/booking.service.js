@@ -8,11 +8,11 @@ const { BOOKED, PENDING, BLOCKED, OPEN, CANCELLED } = constants.status;
 const { CLINIC_ADMIN, CLINIC_USER, PATIENT } = constants.roles;
 const scheduleList = require("../utils/schedule.util");
 
-exports.createBooking = async function ({ patient_email_id, clinic_id, doctor_id, date, time, status }, userInfo, callback) {
-  const bookingData = { patient_email_id, clinic_id, doctor_id, date, time, status };
+exports.createBooking = async function ({ patient_email_id, clinic_id, doctor_id, time_slot, status }, userInfo, callback) {
+  const bookingData = { patient_email_id, clinic_id, doctor_id, time_slot, status };
   try {
     if (userInfo.email_id === patient_email_id) {
-      const existingDetails = await Booking.findOne({ where: { doctor_id, time, status: { [Op.or]: [BOOKED, PENDING, OPEN] } } });
+      const existingDetails = await Booking.findOne({ where: { doctor_id, time_slot, status: { [Op.or]: [BOOKED, PENDING, OPEN] } } });
       if (existingDetails !== null) {
         throw ("Timeslot Already Booked");
       } else {
@@ -42,7 +42,7 @@ exports.insertSchedule = async function ({ clinic_id, doctor_id, load_date }, { 
     if (Array.isArray(timeslots) && timeslots.length) {
       let schedule;
       for (let index = 0; index < timeslots.length; index++) {
-        schedule = await Booking.create({ patient_email_id: '', clinic_id, doctor_id, date: load_date, time: timeslots[index], status: OPEN }, { transaction });
+        schedule = await Booking.create({ patient_email_id: '', clinic_id, doctor_id, time: timeslots[index], status: OPEN }, { transaction });
       }
       await transaction.commit();
       if (schedule) {
@@ -61,7 +61,7 @@ exports.insertSchedule = async function ({ clinic_id, doctor_id, load_date }, { 
   }
 };
 
-exports.cancelBooking = async function ({ patient_email_id, clinic_id, doctor_id, date, time, status }, userInfo, callback) {
+exports.cancelBooking = async function ({ patient_email_id, clinic_id, doctor_id, time_slot, status }, userInfo, callback) {
   try {
     if (userInfo.user_type === PATIENT) {
       if (userInfo.email_id !== patient_email_id) throw ("Unauthorised to Cancel Booking");
@@ -70,10 +70,10 @@ exports.cancelBooking = async function ({ patient_email_id, clinic_id, doctor_id
     } else {
       throw ("Unauthorised to Cancel Booking");
     }
-    const bookedInfo = await Booking.findOne({ where: { patient_email_id, clinic_id, doctor_id, date, time, status } });
+    const bookedInfo = await Booking.findOne({ where: { patient_email_id, clinic_id, doctor_id, time_slot, status } });
     if (bookedInfo !== null) {
       console.log(`Booking details of patient:${patient_email_id}`);
-      await Booking.update({ status: CANCELLED }, { where: { patient_email_id, clinic_id, doctor_id, date, time, status } })
+      await Booking.update({ status: CANCELLED }, { where: { patient_email_id, clinic_id, doctor_id, time_slot, status } })
         .then((result) => {
           callback(null, { message: `Cancelled Booking:${result}` });
         }).catch(error => {
@@ -90,21 +90,22 @@ exports.cancelBooking = async function ({ patient_email_id, clinic_id, doctor_id
   }
 };
 
-exports.viewBooking = async function ({ from, to }, { date }, userInfo, callback) {
+exports.viewBooking = async function ({ from, to }, { given_date }, userInfo, callback) {
   const to_record = to || 50;
   const offset = from || 0;
   const limit = Math.min(25, to_record - offset);
   try {
     if ([CLINIC_ADMIN, CLINIC_USER].includes(userInfo.user_type)) {
-      await Booking.findAndCountAll({ limit, offset, where: { date, clinic_id: userInfo.clinic_id } })
-        .then((bookingDetails) => {
-          callback(null, bookingDetails)
-        }).catch(error => {
-          console.log(`View Booking catch(Clinic): ${JSON.stringify(error)} `);
-          callback(error);
-        })
+      //await Booking.findAndCountAll({ limit, offset, where: { Date(time_slot): given_date, clinic_id: userInfo.clinic_id }, order: [['time', 'ASC']] })
+
+      await Booking.findAndCountAll({ limit, offset }).then((bookingDetails) => {
+        callback(null, bookingDetails)
+      }).catch(error => {
+        console.log(`View Booking catch(Clinic): ${JSON.stringify(error)} `);
+        callback(error);
+      })
     } else if (userInfo.user_type === PATIENT) {
-      await Booking.findAndCountAll({ limit, offset, where: { date, patient_email_id: userInfo.email_id } })
+      await Booking.findAndCountAll({ limit, offset, where: { patient_email_id: userInfo.email_id } })
         .then((bookingDetails) => {
           callback(null, bookingDetails)
         }).catch(error => {

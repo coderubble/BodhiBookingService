@@ -6,7 +6,8 @@
     "host": "192.168.99.100",
     "dialect": "postgres",
     "dialectOptions": {
-      "useUTC": false
+      "dateStrings": true,
+      "typeCast": true
     },
     "timezone": "+10:00"
   },
