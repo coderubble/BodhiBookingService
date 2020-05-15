@@ -4,9 +4,10 @@
   "description": "Manage Booking details",
   "main": "index.js",
   "scripts": {
-    "test": "env-cmd -f src/config/test.env jest --config ./jest.config.json --coverage --detectOpenHandles --maxWorkers=2",
-    "test:debug": "env-cmd -f config/test.env node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand test/booking.spec.js",
-    "dev": "env-cmd -f src/config/dev.env nodemon src/app.js"
+    "test": "set NODE_ENV=test && jest --config ./jest.config.json --coverage --detectOpenHandles --maxWorkers=2",
+    "test:debug": "set NODE_ENV=test && node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand test/booking.spec.js",
+    "dev": "set NODE_ENV=dev && nodemon src/app.js",
+    "dev:linux": "./node_modules/.bin/env-cmd -f config/linux.env nodemon src/app.js"
   },
   "repository": {
     "type": "git",

@@ -27,3 +27,7 @@ seeders, contains all seed files
         "status":"BOOKED"
     }
 ```
+## migration
+```
+$ ./node_modules/.bin/env-cmd -f ./config/linux.env npx sequelize-cli db:migrate
+```

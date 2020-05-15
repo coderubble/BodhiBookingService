@@ -1,5 +1,5 @@
 'use strict';
-const constants = require("../constants/constants");
+const constants = require("../src/constants/constants");
 const { BOOKED, PENDING, BLOCKED, OPEN, CANCELLED } = constants.status;
 module.exports = {
   up: (queryInterface, DataTypes) => {
