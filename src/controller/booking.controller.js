@@ -9,8 +9,10 @@ router.post("/", auth, (req, res) => {
     if (result) {
       const userInfo = result.data;
       createBooking(req.body, userInfo, (error, result) => {
-        if (result) {
+        if (result === 1) {
           res.status(201).send(result);
+        } else if (result === 0) {
+          res.status(400).send(error);
         } else {
           res.status(403).send(error);
         }
@@ -43,7 +45,7 @@ router.put("/", auth, (req, res) => {
   });
 })
 //View Bookings by Clinic Admin/Clinic User of their clinic on a particular date
-router.get("/:given_date", auth,(req, res) => {
+router.get("/:given_date", auth, (req, res) => {
   getUserInfo(res, (error, result) => {
     if (result) {
       const userInfo = result.data;

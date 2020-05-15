@@ -12,19 +12,18 @@ exports.createBooking = async function ({ patient_email_id, clinic_id, doctor_id
   const bookingData = { patient_email_id, clinic_id, doctor_id, time_slot, status };
   try {
     if (userInfo.email_id === patient_email_id) {
-      const existingDetails = await Booking.findOne({ where: { doctor_id, time_slot, status: { [Op.or]: [BOOKED, PENDING, OPEN] } } });
-      if (existingDetails !== null) {
-        throw ("Timeslot Already Booked");
-      } else {
-        await Booking.create(bookingData).then(result => {
-          callback(null, result);
+      await Booking.update({ patient_email_id, status: BOOKED }, { where: { clinic_id, doctor_id, status: { [Op.or]: [OPEN, CANCELLED] }, time_slot } })
+        .then(result => {
+          if (result === 1) {
+            callback(null, result);
+          } else {
+            throw ("Cannot Book");
+          }
         }).catch(error => {
           console.log(`Error:${JSON.stringify(error)}`);
-          throw ("Error while creating Booking data");
+          throw error;
         });
-      }
-    }
-    else {
+    } else {
       throw ("Unauthorized to create Booking");
     }
   } catch (error) {
