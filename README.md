@@ -21,9 +21,9 @@ seeders, contains all seed files
 ```
      { 
         "patient_email_id": "patient1@usa.com",   
-        "clinic_id":"5eab42762d4e1b4db8fd6a8c",
-        "doctor_id":"5eab42762d4e1b4db8fd6a8d",
-        "time_slot": "10:00",
+        "clinic_id":"5ebba903f8d5c4bd90cfee4a",
+        "doctor_id":"5ebba903f8d5c4bd90cfee4b",
+        "time_slot": "2020-05-14 22:00:00+00",
         "status":"BOOKED"
     }
 ```

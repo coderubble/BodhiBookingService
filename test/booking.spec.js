@@ -7,6 +7,13 @@ const constants = require("../src/constants/constants");
 const { BOOKED, PENDING, BLOCKED, OPEN, CANCELLED } = constants.status
 const { CLINIC_ADMIN, CLINIC_USER, PATIENT } = constants.roles;
 
+const loadBookingData={
+  patient_email_id: "",
+  clinic_id: "12345",
+  doctor_id: "d123",
+  time_slot: "11:30",
+  status: OPEN
+}
 const bookingData = {
   patient_email_id: "patient@bodhi.com",
   clinic_id: "12345",
@@ -52,6 +59,19 @@ describe("Booking Service", () => {
     await app.close;
     done();
   });
+
+  // it("Should load Doctor Schedule", async (done) => {
+  //   mock.onGet(`${process.env.USERSERVICE_URL}/user`).reply(200, {
+  //     "email_id": "patient@bodhi.com",
+  //     "user_type": "P",
+  //     "clinic_id": null
+  //   });
+  //   const res = await request(app)
+  //     .post(`${process.env.API_PREFIX}/booking/createSchedule/12345/d123/2020-01-01`).send(loadBookingData)
+  //     .set("authorization", '123');
+  //   expect(res.statusCode).toEqual(201);
+  //   done();
+  // });
 
   it("Create Booking Success", async (done) => {
     mock.onGet(`${process.env.USERSERVICE_URL}/user`).reply(200, {

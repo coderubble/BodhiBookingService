@@ -9,10 +9,8 @@ router.post("/", auth, (req, res) => {
     if (result) {
       const userInfo = result.data;
       createBooking(req.body, userInfo, (error, result) => {
-        if (result === 1) {
-          res.status(201).send(result);
-        } else if (result === 0) {
-          res.status(400).send(error);
+        if (result) {
+          res.status(201).send("Success");
         } else {
           res.status(403).send(error);
         }
@@ -27,12 +25,10 @@ router.post("/", auth, (req, res) => {
 router.put("/", auth, (req, res) => {
   getUserInfo(res, (error, result) => {
     if (result) {
-      console.log(`UserInfo:${JSON.stringify(result.data)}`);
       const userInfo = result.data;
-
       cancelBooking(req.body, userInfo, (error, result) => {
         if (result) {
-          res.status(201).send(result);
+          res.status(201).send("Cancelled Booking");
         }
         else {
           res.status(403).send(error);

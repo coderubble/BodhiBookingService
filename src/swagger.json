@@ -26,7 +26,7 @@
       "description": "Access token is missing or invalid"
     }
   },
-  "host": "localhost:3000",
+  "host": "localhost:3003",
   "basePath": "/api/v1",
   "tags": [
     {
@@ -34,54 +34,13 @@
       "description": "API for booking in the system"
     }
   ],
-  "schemes": [
-    "http"
-  ],
-  "consumes": [
-    "application/json"
-  ],
-  "produces": [
-    "application/json"
-  ],
+  "schemes": ["http"],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
   "paths": {
     "/booking": {
-      "get": {
-        "tags": [
-          "Booking"
-        ],
-        "summary": "Get all Booking details in system",
-        "description": "This can only be done by the logged in user.",
-        "operationId": "viewBooking",
-        "produces": "application/xml,application/json",
-        "parameters": [
-          {
-            "name": "from",
-            "in": "query",
-            "required": "true",
-            "description": "From Record",
-            "default": "0"
-          },
-          {
-            "name": "to",
-            "in": "query",
-            "required": "true",
-            "description": "To Record",
-            "default": "10"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/Booking"
-            }
-          }
-        }
-      },
       "post": {
-        "tags": [
-          "Booking"
-        ],
+        "tags": ["Booking"],
         "summary": "Create booking details into system",
         "description": "This can only be done by the logged in user.",
         "operationId": "createBooking",
@@ -104,9 +63,7 @@
         }
       },
       "put": {
-        "tags": [
-          "Booking"
-        ],
+        "tags": ["Booking"],
         "summary": "Cancel Booking",
         "description": "This can only be done by the logged in user.",
         "operationId": "cancelBooking",
@@ -131,9 +88,7 @@
     },
     "/booking/{given_date}": {
       "delete": {
-        "tags": [
-          "Booking"
-        ],
+        "tags": ["Booking"],
         "summary": "Delete Booking in system",
         "description": "This can only be done by the logged in user.",
         "operationId": "deleteUser",
@@ -156,9 +111,7 @@
         }
       },
       "get": {
-        "tags": [
-          "Booking"
-        ],
+        "tags": ["Booking"],
         "summary": "View Booking details by Date",
         "description": "This can only be done by the logged in user.",
         "operationId": "viewUser",
@@ -183,9 +136,7 @@
     },
     "/booking/createSchedule/{clinic_id}/{doctor_id}/{load_date}": {
       "post": {
-        "tags": [
-          "Booking"
-        ],
+        "tags": ["Booking"],
         "summary": "Load Doctor Schedule details by Clinic ID & Doctor ID",
         "description": "This can only be done by the logged in user.",
         "operationId": "createSchedule",
@@ -223,9 +174,7 @@
   },
   "definitions": {
     "Booking": {
-      "required": [
-        "booking_id"
-      ],
+      "required": ["booking_id"],
       "properties": {
         "patient_email_id": {
           "type": "string",

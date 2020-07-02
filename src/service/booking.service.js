@@ -14,7 +14,7 @@ exports.createBooking = async function ({ patient_email_id, clinic_id, doctor_id
     if (userInfo.email_id === patient_email_id) {
       await Booking.update({ patient_email_id, status: BOOKED }, { where: { clinic_id, doctor_id, status: { [Op.or]: [OPEN, CANCELLED] }, time_slot } })
         .then(result => {
-          if (result === 1) {
+          if (result == 1) {
             callback(null, result);
           } else {
             throw ("Cannot Book");
@@ -71,7 +71,6 @@ exports.cancelBooking = async function ({ patient_email_id, clinic_id, doctor_id
     }
     const bookedInfo = await Booking.findOne({ where: { patient_email_id, clinic_id, doctor_id, time_slot, status } });
     if (bookedInfo !== null) {
-      console.log(`Booking details of patient:${patient_email_id}`);
       await Booking.update({ status: CANCELLED }, { where: { patient_email_id, clinic_id, doctor_id, time_slot, status } })
         .then((result) => {
           callback(null, { message: `Cancelled Booking:${result}` });
@@ -90,8 +89,6 @@ exports.cancelBooking = async function ({ patient_email_id, clinic_id, doctor_id
 };
 
 exports.viewBooking = async function ({ from, to }, { given_date }, userInfo, callback) {
-  console.log(`given date:${given_date}`);
-
   const to_record = to || 50;
   const offset = from || 0;
   const limit = Math.min(25, to_record - offset);
