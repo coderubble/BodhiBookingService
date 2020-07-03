@@ -1,9 +1,10 @@
 const models = require("../models");
+const moment = require("moment-timezone");
 const sequelize = models.sequelize;
 const Booking = models.booking;
 const constants = require("../constants/constants");
 const { Op } = require("sequelize");
-const parser = require('cron-parser');
+const parser = require("cron-parser");
 const { BOOKED, PENDING, BLOCKED, OPEN, CANCELLED } = constants.status;
 const { CLINIC_ADMIN, CLINIC_USER, PATIENT } = constants.roles;
 const scheduleList = require("../utils/schedule.util");
@@ -123,17 +124,44 @@ exports.viewBooking = async function ({ from, to }, { given_date }, userInfo, ca
   }
 }
 
-exports.loadSchedule = async function ({ doctor_id }, callback) {
+exports.loadSchedule = async function ({ clinic_id, given_date }, callback) {
+  console.log(`given date:${given_date}`);
+  let start = moment.tz(given_date, "Australia/Sydney");
+  let end = moment(given_date).add(1, 'day');
+  console.log(`start:${start},end:${end}`);
+
   await Booking.findAll({
-    attributes: [ 'time_slot' ],
+    attributes: [ 'doctor_id', 'time_slot' ],
     where: {
-      doctor_id: doctor_id
+      clinic_id: clinic_id,
+      time_slot: {
+        [ Op.between ]: [ start, end ]
+      },
     }, order: [ [ 'time_slot', 'ASC' ] ], raw: true
   })
     .then((schedule) => {
+      let timeArray = schedule.map(times => {
+        let t = times.time_slot;
+        moment.tz(t, "Australia/Sydney");
+      })
+
+      let drArray = schedule.map(doctor => {
+        console.log(`dr>>>>${doctor.doctor_id}`);
+        return doctor.doctor_id;
+      })
+      let unique = [ ...new Set(drArray) ];
+      console.log(`unique:${unique}`);
+      // let drArray = schedule.doctor_id;
+      // console.log(`drarray:${JSON.stringify(schedule)}`);
+      // let unique = [ ...new Set[ drArray ] ];
+      // console.log(`unique:${unique}`);
       callback(null, schedule);
     }).catch(error => {
-      console.log(`View Schedule catch(Clinic): ${JSON.stringify(error)} `);
+      console.log(`View Schedule catch(Clinic): ${JSON.stringify(error.message)} `);
       callback(error);
     })
 }
+// where: {
+//   clinic_id: userInfo.clinic_id,
+//   andOp: sequelize.where(sequelize.fn('DATE', sequelize.col('time_slot')), given_date)
+// },

@@ -10,7 +10,7 @@
       "typeCast": true,
       "useUTC": false
     },
-    "timezone": "+10:00"
+    "timezone": "Australia/Sydney"
   },
   "test": {
     "username": null,

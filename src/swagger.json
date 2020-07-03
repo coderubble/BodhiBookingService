@@ -171,19 +171,25 @@
         }
       }
     },
-    "/booking/load/loadSchedule/{doctor_id}": {
+    "/booking/load/loadSchedule/{clinic_id}/{given_date}": {
       "get": {
         "tags": ["Booking"],
-        "summary": "Load Doctor Schedule details by Doctor ID",
+        "summary": "Load Doctor Schedule details by Clinic ID & Given Date",
         "description": "This can only be done by the logged in user.",
         "operationId": "loadSchedule",
         "produces": "application/xml,application/json",
         "parameters": [
           {
-            "name": "doctor_id",
+            "name": "clinic_id",
             "in": "path",
             "required": "true",
-            "description": "Enter Doctor ID"
+            "description": "Enter Clinic ID"
+          },
+          {
+            "name": "given_date",
+            "in": "path",
+            "required": "true",
+            "description": "Enter Date"
           }
         ],
         "responses": {

@@ -60,7 +60,7 @@ router.get("/:given_date", auth, (req, res) => {
   })
 });
 
-router.get("/load/loadSchedule/:doctor_id", (req, res) => {
+router.get("/load/loadSchedule/:clinic_id/:given_date", (req, res) => {
   loadSchedule(req.params, (error, result) => {
     if (result) {
       res.status(200).send(result);
@@ -74,7 +74,8 @@ router.get("/load/loadSchedule/:doctor_id", (req, res) => {
 router.post("/createSchedule/:clinic_id/:doctor_id/:load_date", (req, res) => {
   getSchedule(req.params, (error, result) => {
     if (result) {
-      var result_string = JSON.stringify(result.data);
+      // var result_string = JSON.stringify(result.data);
+      // console.log(result_string);
       insertSchedule(req.params, result.data, (error, result) => {
         if (result) {
           res.status(200).send(result);
