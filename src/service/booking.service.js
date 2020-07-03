@@ -140,22 +140,26 @@ exports.loadSchedule = async function ({ clinic_id, given_date }, callback) {
     }, order: [ [ 'time_slot', 'ASC' ] ], raw: true
   })
     .then((schedule) => {
-      let timeArray = schedule.map(times => {
-        let t = times.time_slot;
-        moment.tz(t, "Australia/Sydney");
+      let scheduleArray = schedule.map(data => {
+        let t = data.time_slot;
+        let currentTimeSlot = moment.tz(t, "Australia/Sydney").format();
+        console.log(`time:${currentTimeSlot}`);
+        return { doctor_id: data.doctor_id, time_slot: currentTimeSlot };
       })
 
-      let drArray = schedule.map(doctor => {
-        console.log(`dr>>>>${doctor.doctor_id}`);
-        return doctor.doctor_id;
-      })
-      let unique = [ ...new Set(drArray) ];
-      console.log(`unique:${unique}`);
+      // let drArray = schedule.map(doctor => {
+      //   console.log(`dr>>>>${doctor.doctor_id}`);
+      //   return doctor.doctor_id;
+      // })
+      // let unique = [ ...new Set(drArray) ];
+      // console.log(`unique:${unique}`);
       // let drArray = schedule.doctor_id;
       // console.log(`drarray:${JSON.stringify(schedule)}`);
       // let unique = [ ...new Set[ drArray ] ];
       // console.log(`unique:${unique}`);
-      callback(null, schedule);
+
+
+      callback(null, scheduleArray);
     }).catch(error => {
       console.log(`View Schedule catch(Clinic): ${JSON.stringify(error.message)} `);
       callback(error);
