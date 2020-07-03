@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const axios = require("axios");
 const auth = require("../middleware/auth");
-const { createBooking, cancelBooking, viewBooking, insertSchedule } = require("../service/booking.service");
+const { createBooking, cancelBooking, viewBooking, insertSchedule, loadSchedule } = require("../service/booking.service");
 
 router.post("/", auth, (req, res) => {
   getUserInfo(res, (error, result) => {
@@ -56,6 +56,17 @@ router.get("/:given_date", auth, (req, res) => {
     } else {
       console.log(`Error::${error}`);
       res.status(403).send(error);
+    }
+  })
+});
+
+router.get("/load/loadSchedule/:doctor_id", (req, res) => {
+  loadSchedule(req.params, (error, result) => {
+    if (result) {
+      res.status(200).send(result);
+    }
+    else {
+      res.status(400).send(error);
     }
   })
 });

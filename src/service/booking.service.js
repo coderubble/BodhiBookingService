@@ -12,7 +12,7 @@ exports.createBooking = async function ({ patient_email_id, clinic_id, doctor_id
   const bookingData = { patient_email_id, clinic_id, doctor_id, time_slot, status };
   try {
     if (userInfo.email_id === patient_email_id) {
-      await Booking.update({ patient_email_id, status: BOOKED }, { where: { clinic_id, doctor_id, status: { [Op.or]: [OPEN, CANCELLED] }, time_slot } })
+      await Booking.update({ patient_email_id, status: BOOKED }, { where: { clinic_id, doctor_id, status: { [ Op.or ]: [ OPEN, CANCELLED ] }, time_slot } })
         .then(result => {
           if (result == 1) {
             callback(null, result);
@@ -41,7 +41,7 @@ exports.insertSchedule = async function ({ clinic_id, doctor_id, load_date }, { 
     if (Array.isArray(timeslots) && timeslots.length) {
       let schedule;
       for (let index = 0; index < timeslots.length; index++) {
-        schedule = await Booking.create({ patient_email_id: '', clinic_id, doctor_id, time_slot: timeslots[index], status: OPEN }, { transaction });
+        schedule = await Booking.create({ patient_email_id: '', clinic_id, doctor_id, time_slot: timeslots[ index ], status: OPEN }, { transaction });
       }
       await transaction.commit();
       if (schedule) {
@@ -64,7 +64,7 @@ exports.cancelBooking = async function ({ patient_email_id, clinic_id, doctor_id
   try {
     if (userInfo.user_type === PATIENT) {
       if (userInfo.email_id !== patient_email_id) throw ("Unauthorised to Cancel Booking");
-    } else if ([CLINIC_ADMIN, CLINIC_USER].includes(userInfo.user_type)) {
+    } else if ([ CLINIC_ADMIN, CLINIC_USER ].includes(userInfo.user_type)) {
       if (userInfo.clinic_id !== clinic_id) throw ("Unauthorised to Cancel Booking");
     } else {
       throw ("Unauthorised to Cancel Booking");
@@ -93,12 +93,12 @@ exports.viewBooking = async function ({ from, to }, { given_date }, userInfo, ca
   const offset = from || 0;
   const limit = Math.min(25, to_record - offset);
   try {
-    if ([CLINIC_ADMIN, CLINIC_USER].includes(userInfo.user_type)) {
+    if ([ CLINIC_ADMIN, CLINIC_USER ].includes(userInfo.user_type)) {
       await Booking.findAndCountAll({
         limit, offset, where: {
           clinic_id: userInfo.clinic_id,
           andOp: sequelize.where(sequelize.fn('DATE', sequelize.col('time_slot')), given_date)
-        }, order: [['time_slot', 'ASC']]
+        }, order: [ [ 'time_slot', 'ASC' ] ]
       })
         .then((bookingDetails) => {
           callback(null, bookingDetails)
@@ -123,6 +123,17 @@ exports.viewBooking = async function ({ from, to }, { given_date }, userInfo, ca
   }
 }
 
-exports.loadSchedule = function (callback) {
-
-};
+exports.loadSchedule = async function ({ doctor_id }, callback) {
+  await Booking.findAll({
+    attributes: [ 'time_slot' ],
+    where: {
+      doctor_id: doctor_id
+    }, order: [ [ 'time_slot', 'ASC' ] ], raw: true
+  })
+    .then((schedule) => {
+      callback(null, schedule);
+    }).catch(error => {
+      console.log(`View Schedule catch(Clinic): ${JSON.stringify(error)} `);
+      callback(error);
+    })
+}

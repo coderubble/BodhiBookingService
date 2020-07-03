@@ -146,19 +146,44 @@
             "name": "clinic_id",
             "in": "path",
             "required": "true",
-            "description": "View my Details"
+            "description": "Enter Clinic ID"
           },
           {
             "name": "doctor_id",
             "in": "path",
             "required": "true",
-            "description": "View my Details"
+            "description": "Enter Doctor ID"
           },
           {
             "name": "load_date",
             "in": "path",
             "required": "true",
-            "description": "View my Details"
+            "description": "Enter Date"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Booking"
+            }
+          }
+        }
+      }
+    },
+    "/booking/load/loadSchedule/{doctor_id}": {
+      "get": {
+        "tags": ["Booking"],
+        "summary": "Load Doctor Schedule details by Doctor ID",
+        "description": "This can only be done by the logged in user.",
+        "operationId": "loadSchedule",
+        "produces": "application/xml,application/json",
+        "parameters": [
+          {
+            "name": "doctor_id",
+            "in": "path",
+            "required": "true",
+            "description": "Enter Doctor ID"
           }
         ],
         "responses": {
