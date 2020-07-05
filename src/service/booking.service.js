@@ -137,13 +137,15 @@ exports.loadSchedule = async function ({ clinic_id, given_date }, callback) {
       time_slot: {
         [ Op.between ]: [ start, end ]
       },
+      status: OPEN
     }, order: [ [ 'time_slot', 'ASC' ] ], raw: true
   })
     .then((schedule) => {
       let scheduleArray = schedule.map(data => {
         let t = data.time_slot;
-        let currentTimeSlot = moment.tz(t, "Australia/Sydney").format();
-        console.log(`time:${currentTimeSlot}`);
+        let currentTimeSlot = moment.tz(t, "Australia/Sydney").format('HH.mm');
+
+        // console.log(`time:${currentTimeSlot}`);
         return { doctor_id: data.doctor_id, time_slot: currentTimeSlot };
       })
 

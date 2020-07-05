@@ -24,6 +24,7 @@ function scheduleList(schedule, load_date, callback) {
   } catch (err) {
     console.log('Error: ' + err.message);
   }
+  console.log(`Timeslots:${timeslots}`);
   return timeslots;
 }
 
