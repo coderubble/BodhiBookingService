@@ -5,21 +5,15 @@ const auth = require("../middleware/auth");
 const { createBooking, cancelBooking, viewBooking, insertSchedule, loadSchedule } = require("../service/booking.service");
 
 router.post("/", auth, (req, res) => {
-  getUserInfo(res, (error, result) => {
+  // console.log(`user>>>>${JSON.stringify(req.user)}`);
+  const { userInfo } = req.user;
+  createBooking(req.body, req.user, (error, result) => {
     if (result) {
-      const userInfo = result.data;
-      createBooking(req.body, userInfo, (error, result) => {
-        if (result) {
-          res.status(201).send("Success");
-        } else {
-          res.status(403).send(error);
-        }
-      })
+      res.status(201).send(result);
     } else {
-      console.log(`Error::${error}`);
       res.status(403).send(error);
     }
-  });
+  })
 });
 
 router.put("/", auth, (req, res) => {

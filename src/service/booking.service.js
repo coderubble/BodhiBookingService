@@ -11,17 +11,18 @@ const scheduleList = require("../utils/schedule.util");
 
 exports.createBooking = async function ({ patient_email_id, clinic_id, doctor_id, time_slot, status }, userInfo, callback) {
   const bookingData = { patient_email_id, clinic_id, doctor_id, time_slot, status };
+  // console.log(`bookingData:${JSON.stringify(bookingData)}`);
+  // var formattedDate = moment(time_slot, 'YYYY-MM-DD hh:mm:ss').toDate();
+  // var utcFormat = moment.utc(formattedDate, 'YYYY-MM-DD hh:mm:ss').format('YYYY-MM-DD HH:mm:ss+00');
+  // console.log(`time:>>>>>>>>>>>>>>>>${utcFormat}`);
   try {
     if (userInfo.email_id === patient_email_id) {
       await Booking.update({ patient_email_id, status: BOOKED }, { where: { clinic_id, doctor_id, status: { [ Op.or ]: [ OPEN, CANCELLED ] }, time_slot } })
         .then(result => {
-          if (result == 1) {
-            callback(null, result);
-          } else {
-            throw ("Cannot Book");
-          }
+          // console.log(`result:${result}`);
+          callback(null, { bookedStatus: result === 0 ? "Booking Failed" : "Booked Successfully" });
         }).catch(error => {
-          console.log(`Error:${JSON.stringify(error)}`);
+          console.log(`Error:${JSON.stringify(error.message)}`);
           throw error;
         });
     } else {
@@ -143,31 +144,16 @@ exports.loadSchedule = async function ({ clinic_id, given_date }, callback) {
     .then((schedule) => {
       let scheduleArray = schedule.map(data => {
         let t = data.time_slot;
-        let currentTimeSlot = moment.tz(t, "Australia/Sydney").format('HH.mm');
+        // let currentTimeSlot = moment.tz(t, "Australia/Sydney").format('YYYY_MM_DD HH:mm:ss');
+        return { doctor_id: data.doctor_id, time_slot: data.time_slot };
 
-        // console.log(`time:${currentTimeSlot}`);
-        return { doctor_id: data.doctor_id, time_slot: currentTimeSlot };
+        // let t = data.time_slot;
+        // let currentTimeSlot = moment.tz(t, "Australia/Sydney").format('HH:mm');
+        // return { doctor_id: data.doctor_id, time_slot: currentTimeSlot };
       })
-
-      // let drArray = schedule.map(doctor => {
-      //   console.log(`dr>>>>${doctor.doctor_id}`);
-      //   return doctor.doctor_id;
-      // })
-      // let unique = [ ...new Set(drArray) ];
-      // console.log(`unique:${unique}`);
-      // let drArray = schedule.doctor_id;
-      // console.log(`drarray:${JSON.stringify(schedule)}`);
-      // let unique = [ ...new Set[ drArray ] ];
-      // console.log(`unique:${unique}`);
-
-
       callback(null, scheduleArray);
     }).catch(error => {
       console.log(`View Schedule catch(Clinic): ${JSON.stringify(error.message)} `);
       callback(error);
     })
 }
-// where: {
-//   clinic_id: userInfo.clinic_id,
-//   andOp: sequelize.where(sequelize.fn('DATE', sequelize.col('time_slot')), given_date)
-// },
