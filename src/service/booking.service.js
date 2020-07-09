@@ -1,4 +1,6 @@
 const models = require("../models");
+var CircularJSON = require('circular-json');
+const axios = require("axios");
 const moment = require("moment-timezone");
 const sequelize = models.sequelize;
 const Booking = models.booking;
@@ -96,7 +98,7 @@ exports.viewBooking = async function ({ from, to }, { given_date }, userInfo, ca
   const limit = Math.min(25, to_record - offset);
   try {
     if ([ CLINIC_ADMIN, CLINIC_USER ].includes(userInfo.user_type)) {
-      await Booking.findAndCountAll({
+      await Booking.findAll({
         limit, offset, where: {
           clinic_id: userInfo.clinic_id,
           andOp: sequelize.where(sequelize.fn('DATE', sequelize.col('time_slot')), given_date)
@@ -109,7 +111,7 @@ exports.viewBooking = async function ({ from, to }, { given_date }, userInfo, ca
           callback(error);
         })
     } else if (userInfo.user_type === PATIENT) {
-      await Booking.findAndCountAll({ limit, offset, where: { patient_email_id: userInfo.email_id } })
+      await Booking.findAll({ limit, offset, where: { patient_email_id: userInfo.email_id } })
         .then((bookingDetails) => {
           callback(null, bookingDetails)
         }).catch(error => {
@@ -126,10 +128,10 @@ exports.viewBooking = async function ({ from, to }, { given_date }, userInfo, ca
 }
 
 exports.loadSchedule = async function ({ clinic_id, given_date }, callback) {
-  console.log(`given date:${given_date}`);
+  //console.log(`given date:${given_date}`);
   let start = moment.tz(given_date, "Australia/Sydney");
   let end = moment(given_date).add(1, 'day');
-  console.log(`start:${start},end:${end}`);
+  //console.log(`start:${start},end:${end}`);
 
   await Booking.findAll({
     attributes: [ 'doctor_id', 'time_slot' ],
@@ -157,3 +159,19 @@ exports.loadSchedule = async function ({ clinic_id, given_date }, callback) {
       callback(error);
     })
 }
+
+exports.viewMyBooking = async function ({ user_id }, callback) {
+  try {
+    const bookingDetails = await Booking.findAll({ attributes: [ 'id', 'patient_email_id', 'clinic_id', 'doctor_id', 'time_slot', 'status' ], where: { patient_email_id: user_id } });
+    const bookingArray = await Promise.all(bookingDetails.map(async d => {
+      result = await axios.get(`${process.env.CLINICSERVICE_URL}/clinic/readClinicName/${d.clinic_id}`);
+      const doctor = await result.data.doctors.filter(doctor => doctor._id === d.doctor_id)[ 0 ];
+      return { email_id: d.patient_email_id, clinic_name: result.data.name, doctor_name: `${doctor.first_name} ${doctor.last_name}`, time_slot: d.time_slot, status: d.status };
+    }));
+    callback(null, bookingArray);
+  } catch (error) {
+    console.log(`View Booking catch(Patient): ${JSON.stringify(error)} `);
+    callback(error);
+  }
+};
+

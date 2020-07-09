@@ -134,6 +134,31 @@
         }
       }
     },
+    "/booking/viewBooking/{user_id}": {
+      "get": {
+        "tags": ["Booking"],
+        "summary": "View My Booking Details",
+        "description": "This can only be done by the logged in user.",
+        "operationId": "viewBooking",
+        "produces": "application/xml,application/json",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": "true",
+            "description": "View my Booking details"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Booking"
+            }
+          }
+        }
+      }
+    },
     "/booking/createSchedule/{clinic_id}/{doctor_id}/{load_date}": {
       "post": {
         "tags": ["Booking"],
